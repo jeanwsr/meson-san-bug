@@ -1,0 +1,32 @@
+name: f2py meson backend (Windows)
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Fortran compiler
+        uses: fortran-lang/setup-fortran@v1
+        with:
+          compiler: gcc
+          version: '13'
+
+      - name: Install build dependencies
+        run: pip install numpy meson ninja
+
+      - name: Build f2py extension (meson backend)
+        run: python -m numpy.f2py -c --backend meson -m fibmod fib.f90
+
+      - name: Run test
+        run: python test_fib.py
