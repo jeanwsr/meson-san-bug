@@ -28,7 +28,34 @@ jobs:
         run: pip install numpy meson ninja
 
       - name: Build f2py extension (meson backend)
-        run: python -m numpy.f2py -c --backend meson --verbose -m fibmod fib.f90
+        run: python -m numpy.f2py -c --backend meson -m fibmod fib.f90
 
       - name: Run test
+        run: python test_fib.py
+
+  build-and-test-conda:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up conda with gfortran and Python
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          python-version: '3.12'
+          channels: conda-forge
+          channel-priority: strict
+
+      - name: Install gfortran and build dependencies via conda
+        shell: bash -el {0}
+        run: conda install -y gfortran numpy meson ninja
+
+      - name: Build f2py extension (meson backend)
+        shell: bash -el {0}
+        run: python -m numpy.f2py -c --backend meson -m fibmod fib.f90
+
+      - name: Run test
+        shell: bash -el {0}
         run: python test_fib.py
