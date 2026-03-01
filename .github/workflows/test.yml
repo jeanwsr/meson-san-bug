@@ -28,7 +28,7 @@ jobs:
         run: pip install numpy meson ninja
 
       - name: Build f2py extension (meson backend)
-        run: python -m numpy.f2py -c --backend meson -m fibmod fib.f90
+        run: python -m numpy.f2py -c --backend meson --verbose -m fibmod fib.f90
 
       - name: Run test
         run: python test_fib.py
