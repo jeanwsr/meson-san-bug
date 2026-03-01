@@ -1,0 +1,64 @@
+name: f2py meson backend (Windows)
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Fortran compiler
+        uses: fortran-lang/setup-fortran@v1
+        with:
+          compiler: gcc
+          version: '13'
+
+      - name: Install build dependencies
+        run: pip install numpy meson ninja
+
+      - name: Install make
+        run: choco install make --no-progress -y
+
+      - name: Build f2py extension (meson backend)
+        run: make build
+
+      - name: Run test
+        run: make test
+
+  build-and-test-conda:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up conda with gfortran and Python
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          python-version: '3.12'
+          channels: conda-forge
+          channel-priority: strict
+
+      - name: Install gfortran and build dependencies via conda
+        shell: bash -el {0}
+        run: conda install -y gfortran numpy meson ninja make
+
+      - name: Build f2py extension (meson backend)
+        shell: bash -el {0}
+        run: make build
+
+      - name: Run test
+        shell: bash -el {0}
+        run: make test
